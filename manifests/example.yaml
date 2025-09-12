@@ -1,0 +1,59 @@
+apiVersion: scheduling.diktyo.x-k8s.io/v1alpha1
+kind: ApplicationClassification
+metadata:
+  annotations:
+    kopf.zalando.org/last-handled-configuration: |
+      {"spec":{"applicationClasses":[{"appGroupWorkloads":[{"appGroup":"teastore","appGroupWorkloads":["teastore-persistence","teastore-registry","teastore-image","teastore-recommender","teastore-auth","teastore-db","teastore-webui","teastore-locust"],"namespace":"test"}],"name":"class-0"}],"globalClassification":{"appGroups":[{"appGroup":"teastore","class":"class-0","namespace":"test"}]},"predicates":[{"expression":"appinfo1.privilegeLevel == appinfo2.privilegeLevel or appinfo1.tenant == appinfo2.tenant","name":"priv-tenant-affinity"}]}}
+    kubectl.kubernetes.io/last-applied-configuration: |
+      {"apiVersion":"scheduling.diktyo.x-k8s.io/v1alpha1","kind":"ApplicationClassification","metadata":{"annotations":{"kopf.zalando.org/last-handled-configuration":"{\"spec\":{\"applicationClasses\":[{\"appGroupWorkloads\":[{\"appGroup\":\"teastore\",\"appGroupWorkloads\":[\"teastore-persistence\",\"teastore-registry\",\"teastore-image\",\"teastore-recommender\",\"teastore-auth\",\"teastore-db\",\"teastore-webui\",\"teastore-locust\"],\"namespace\":\"test\"},{\"appGroup\":\"teastore2\",\"appGroupWorkloads\":[\"teastore-recommender\",\"teastore-auth\",\"teastore-registry\",\"teastore-locust\",\"teastore-webui\",\"teastore-persistence\",\"teastore-image\"],\"namespace\":\"test2\"}],\"name\":\"class-0\"},{\"appGroupWorkloads\":[{\"appGroup\":\"teastore2\",\"appGroupWorkloads\":[\"teastore-db\"],\"namespace\":\"test2\"}],\"name\":\"class-1\"}],\"globalClassification\":{\"appGroups\":[{\"appGroup\":\"teastore\",\"class\":\"class-0\",\"namespace\":\"test\"},{\"appGroup\":\"teastore2\",\"class\":\"class-0\",\"namespace\":\"test2\"}]},\"predicates\":[{\"expression\":\"appinfo1.privilegeLevel == appinfo2.privilegeLevel or appinfo1.tenant == appinfo2.tenant\",\"name\":\"priv-tenant-affinity\"}]}}\n"},"creationTimestamp":"2025-06-24T19:26:37Z","generation":2,"name":"global-classification","resourceVersion":"77154845","uid":"960c1d4f-4f7f-4d6b-a914-035e5fc90b7a"},"spec":{"applicationClasses":[{"appGroupWorkloads":[{"appGroup":"teastore","appGroupWorkloads":["teastore-persistence","teastore-registry","teastore-image","teastore-recommender","teastore-auth","teastore-db","teastore-webui","teastore-locust"],"namespace":"test"}],"name":"class-0"}],"globalClassification":{"appGroups":[{"appGroup":"teastore","class":"class-0","namespace":"test"}]},"predicates":[{"expression":"appinfo1.privilegeLevel == appinfo2.privilegeLevel or appinfo1.tenant == appinfo2.tenant","name":"priv-tenant-affinity"}]},"status":{"applicationClasses":[{"appInfos":[{"appGroup":"teastore","appGroupWorkloads":["teastore-persistence","teastore-registry","teastore-image","teastore-recommender","teastore-auth","teastore-db","teastore-webui","teastore-locust"],"name":"teastore-info","namespace":"test"}],"name":"class-0"}],"globalClassification":{"appGroups":[{"appInfo":"teastore-info","class":"class-0","name":"teastore","namespace":"test"}]}}}
+  creationTimestamp: "2025-06-24T19:26:37Z"
+  generation: 3
+  name: global-classification
+  resourceVersion: "77154978"
+  uid: 960c1d4f-4f7f-4d6b-a914-035e5fc90b7a
+spec:
+  applicationClasses:
+    - appGroupWorkloads:
+        - appGroup: teastore
+          appGroupWorkloads:
+            - teastore-persistence
+            - teastore-registry
+            - teastore-image
+            - teastore-recommender
+            - teastore-auth
+            - teastore-db
+            - teastore-webui
+            - teastore-locust
+          namespace: test
+      name: class-0
+  globalClassification:
+    appGroups:
+      - appGroup: teastore
+        class: class-0
+        namespace: test
+  predicates:
+    - expression: appinfo1.privilegeLevel == appinfo2.privilegeLevel or appinfo1.tenant
+        == appinfo2.tenant
+      name: priv-tenant-affinity
+status:
+  applicationClasses:
+    - appInfos:
+        - appGroup: teastore
+          appGroupWorkloads:
+            - teastore-persistence
+            - teastore-registry
+            - teastore-image
+            - teastore-recommender
+            - teastore-auth
+            - teastore-db
+            - teastore-webui
+            - teastore-locust
+          name: teastore-info
+          namespace: test
+      name: class-0
+  globalClassification:
+    appGroups:
+      - appInfo: teastore-info
+        class: class-0
+        name: teastore
+        namespace: test
