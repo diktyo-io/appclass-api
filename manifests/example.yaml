@@ -1,5 +1,5 @@
-apiVersion: scheduling.diktyo.x-k8s.io/v1alpha1
-kind: ApplicationClassification
+apiVersion: appclass.diktyo.x-k8s.io/v1alpha1
+kind: AppClass
 metadata:
   annotations:
     kopf.zalando.org/last-handled-configuration: |
