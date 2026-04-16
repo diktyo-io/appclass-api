@@ -1,7 +1,7 @@
 apiVersion: apiextensions.k8s.io/v1
 kind: CustomResourceDefinition
 metadata:
-  name: appclasses.diktyo.x-k8s.io
+  name: appclasses.appclass.diktyo.x-k8s.io
 spec:
   group: appclass.diktyo.x-k8s.io
   names:
@@ -11,7 +11,7 @@ spec:
     singular: appclass
     shortNames:
       - ac
-  scope: Namespaced
+  scope: Cluster
   versions:
     - name: v1alpha1
       served: true
@@ -24,36 +24,141 @@ spec:
           properties:
             spec:
               type: object
+              required: ["type"]
               properties:
+                type:
+                  type: string
+                  enum: ["Property", "Explicit", "Predicate"]
+                propertyDefinition:
+                  type: object
+                  properties:
+                    appInfoProperties:
+                      type: array
+                      items: { type: string }
+                explicitDefinition:
+                  type: object
+                  required: ["other", "classDefs"]
+                  properties:
+                    other: { type: string }
+                    classDefs:
+                      type: array
+                      minItems: 1
+                      items:
+                        type: object
+                        required: ["class", "clauses"]
+                        properties:
+                          class: { type: string }
+                          clauses:
+                            type: array
+                            minItems: 1
+                            items:
+                              type: object
+                              required: ["conditions"]
+                              properties:
+                                conditions:
+                                  type: array
+                                  minItems: 1
+                                  items:
+                                    type: object
+                                    properties:
+                                      property: { type: string }
+                                      operator: { type: string, enum: ["=", "!=", "<", "<=", ">", ">="] }
+                                      value: { type: string }
+                                      otherProperty: { type: string }
+                                    oneOf:
+                                      - required: ["property", "operator", "value"]
+                                      - required: ["property", "operator", "otherProperty"]
+
+                # Implementation of Classif ::= name: String Clauses
                 predicates:
                   type: array
                   items:
                     type: object
+                    required: ["name", "clauses"]
                     properties:
                       name:
                         type: string
-                      expression:
-                        type: string
+                      # Clauses ::= Clause | Clause OR Clauses
+                      clauses:
+                        type: array
+                        minItems: 1
+                        items:
+                          type: object
+                          required: ["andClauses"]
+                          properties:
+                            # Clause ::= Conds | Conds AND Clause
+                            andClauses:
+                              type: array
+                              minItems: 1
+                              items:
+                                type: object
+                                properties:
+                                  # Conds ::= left: Cond | right: Cond | rel: Rel
+                                  left:
+                                    type: object
+                                    properties:
+                                      property: { type: string }
+                                      operator: { type: string, enum: ["=", "!=", "<", "<=", ">", ">="] }
+                                      value: { type: string }
+                                      rel:
+                                        type: object
+                                        required: ["property", "operator", "otherProperty"]
+                                        properties:
+                                          property: { type: string }
+                                          operator: { type: string, enum: ["=", "!=", "<", "<=", ">", ">="] }
+                                          otherProperty: { type: string }
+                                    oneOf:
+                                      - required: ["property", "operator", "value"]
+                                      - required: ["rel"]
+                                  right:
+                                    type: object
+                                    properties:
+                                      property: { type: string }
+                                      operator: { type: string, enum: ["=", "!=", "<", "<=", ">", ">="] }
+                                      value: { type: string }
+                                      rel:
+                                        type: object
+                                        required: ["property", "operator", "otherProperty"]
+                                        properties:
+                                          property: { type: string }
+                                          operator: { type: string, enum: ["=", "!=", "<", "<=", ">", ">="] }
+                                          otherProperty: { type: string }
+                                    oneOf:
+                                      - required: ["property", "operator", "value"]
+                                      - required: ["rel"]
+                                  rel:
+                                    type: object
+                                    required: ["property", "operator", "otherProperty"]
+                                    properties:
+                                      property: { type: string }
+                                      operator: { type: string, enum: ["=", "!=", "<", "<=", ">", ">="] }
+                                      otherProperty: { type: string }
+                                oneOf:
+                                  - required: ["left"]
+                                  - required: ["right"]
+                                  - required: ["rel"]
                 applicationClasses:
                   type: array
                   items:
                     type: object
                     properties:
-                      name:
-                        type: string
-                      appGroupWorkloads:
+                      name: { type: string }
+                      inGroup:
+                        type: array
+                        items: { type: string }
+                      outGroup:
+                        type: array
+                        items: { type: string }
+                      appGroupWorkloads: # Mapping field used in your jq script
                         type: array
                         items:
                           type: object
                           properties:
-                            namespace:
-                              type: string
-                            appGroup:
-                              type: string
+                            namespace: { type: string }
+                            appGroup: { type: string }
                             appGroupWorkloads:
                               type: array
-                              items:
-                                type: string
+                              items: { type: string }
                 globalClassification:
                   type: object
                   properties:
@@ -62,52 +167,45 @@ spec:
                       items:
                         type: object
                         properties:
-                          class:
-                            type: string
-                          namespace:
-                            type: string
-                          appGroup:
-                            type: string
+                          class: { type: string }
+                          namespace: { type: string }
+                          appGroup: { type: string }
             status:
               type: object
               properties:
+                globalClassification:
+                  type: object
+                  properties:
+                    appGroups:
+                      type: array
+                      items:
+                        type: object
+                        properties:
+                          name: { type: string }       # Workload name
+                          appInfo: { type: string }    # AppInfo CR name
+                          class: { type: string }      # Assigned Class Name
+                          namespace: { type: string }
+                          appGroup: { type: string }
                 applicationClasses:
                   type: array
                   items:
                     type: object
                     properties:
-                      name:
-                        type: string
+                      name: { type: string }
+                      inGroup:
+                        type: array
+                        items: { type: string }
+                      outGroup:
+                        type: array
+                        items: { type: string }
                       appInfos:
                         type: array
                         items:
                           type: object
                           properties:
-                            name:
-                              type: string
-                            namespace:
-                              type: string
-                            appGroup:
-                              type: string
+                            name: { type: string }
+                            namespace: { type: string }
+                            appGroup: { type: string }
                             appGroupWorkloads:
                               type: array
-                              items:
-                                type: string
-                globalClassification:
-                  type: object
-                  properties:
-                    appGroups:
-                      type: array
-                      items:
-                        type: object
-                        properties:
-                          name:
-                            type: string
-                          appInfo:
-                            type: string
-                          class:
-                            type: string
-                          namespace:
-                            type: string
-                          appGroup:
-                            type: string
+                              items: { type: string }
